@@ -7,7 +7,9 @@ import (
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/scys12/simple-grpc-go/config"
+	"github.com/scys12/simple-grpc-go/pkg/gateway"
 	"github.com/scys12/simple-grpc-go/pkg/protocol/grpc"
+	"github.com/scys12/simple-grpc-go/pkg/protocol/rest"
 	"github.com/scys12/simple-grpc-go/pkg/service/v1/todo"
 )
 
@@ -40,6 +42,19 @@ func RunServer() error {
 	defer db.Close()
 
 	v1API := todo.NewTodoServiceServer(db)
+
+	opts := gateway.Options{
+		Addr: ":" + cfg.HTTPPort,
+		GRPCServer: gateway.Endpoint{
+			Network: "tcp",
+			Addr:    fmt.Sprintf("%v:%v", cfg.GRPCHost, cfg.GRPCPort),
+		},
+		OpenAPIDir: cfg.OpenAPIDir,
+	}
+
+	go func() {
+		_ = rest.RunServer(ctx, opts)
+	}()
 
 	return grpc.RunServer(ctx, v1API, cfg.GRPCPort)
 }

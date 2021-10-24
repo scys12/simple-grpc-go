@@ -14,7 +14,10 @@ type Config struct {
 	DBPort     string `mapstructure:"db_port"`
 	DBUser     string `mapstructure:"db_user"`
 	DBPassword string `mapstructure:"db_password"`
+	HTTPPort   string `mapstructure:"http_port"`
 	GRPCPort   string `mapstructure:"grpc_port"`
+	GRPCHost   string `mapstructure:"grpc_host"`
+	OpenAPIDir string `mapstructure:"openapi_dir"`
 }
 
 func parseConfigFilePath() string {
@@ -32,11 +35,11 @@ func NewConfig() *Config {
 	viper.AddConfigPath(configPath)
 	err := viper.ReadInConfig()
 	if err != nil {
-		panic(fmt.Errorf("Fatal error config file: %s\n", err))
+		panic(fmt.Errorf("fatal error config file: %s", err))
 	}
 	config := new(Config)
 	if err := viper.Unmarshal(config); err != nil {
-		panic(fmt.Errorf("failed to parse config file: %w\n", err))
+		panic(fmt.Errorf("failed to parse config file: %w", err))
 	}
 	return config
 }
