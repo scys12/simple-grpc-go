@@ -1,0 +1,79 @@
+// See README.txt for information and build instructions.
+//
+// Note: START and END tags are used in comments to define sections used in
+// tutorials.  They are not part of the syntax for Protocol Buffers.
+//
+// To get an in-depth walkthrough of this file and the related examples, see:
+// https://developers.google.com/protocol-buffers/docs/tutorials
+
+// [START declaration]
+syntax = "proto3";
+package tutorial;
+
+import "google/protobuf/timestamp.proto";
+
+option go_package = "github.com/scys12/simple-grpc-go/api/proto/v1";
+
+message Todo {
+  int64 id = 1;
+  string title = 2;
+  string description = 3;
+  google.protobuf.Timestamp reminder = 4;
+}
+
+message CreateRequest {
+  string apiV = 1;
+  Todo todo = 2;
+}
+
+message CreateResponse{
+  string apiV = 1;
+  int64 id = 2;
+}
+
+message ReadRequest {
+  string apiV = 1;
+  int64 id = 2;
+}
+
+message ReadResponse {
+  string apiV = 1;
+  Todo todo = 2;
+}
+
+message UpdateRequest {
+  string apiV = 1;
+  Todo todo = 2;
+}
+
+message UpdateResponse {
+  string apiV = 1;
+  int64 updated = 2;
+}
+
+message DeleteRequest {
+  string apiV = 1;
+  int64 id = 2;
+}
+
+message DeleteResponse {
+  string apiV = 1;
+  int64 deleted = 2;
+}
+
+message ReadAllRequest {
+  string apiV = 1;
+}
+
+message ReadAllResponse {
+  string apiV = 1;
+  repeated Todo todos = 2;
+}
+
+service TodoService {
+  rpc Create (CreateRequest) returns (CreateResponse);
+  rpc Read (ReadRequest) returns (ReadResponse);
+  rpc Update (UpdateRequest) returns (UpdateResponse);
+  rpc Delete (DeleteRequest) returns (DeleteResponse);
+  rpc ReadAll (ReadAllRequest) returns (ReadAllResponse);
+}
