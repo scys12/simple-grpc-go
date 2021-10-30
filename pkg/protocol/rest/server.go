@@ -2,10 +2,11 @@ package rest
 
 import (
 	"context"
-	"log"
 	"net/http"
 
 	"github.com/scys12/simple-grpc-go/pkg/gateway"
+	"github.com/scys12/simple-grpc-go/pkg/logger"
+	"go.uber.org/zap"
 )
 
 func RunServer(ctx context.Context, options gateway.Options) error {
@@ -21,7 +22,7 @@ func RunServer(ctx context.Context, options gateway.Options) error {
 	go func() {
 		<-ctx.Done()
 		if err := conn.Close(); err != nil {
-			log.Printf("Failed to close a client connection to the gRPC server: %v", err)
+			logger.Log.Error("Failed to close a client connection to the gRPC server:", zap.String("reason", err.Error()))
 		}
 	}()
 
@@ -43,16 +44,16 @@ func RunServer(ctx context.Context, options gateway.Options) error {
 
 	go func() {
 		<-ctx.Done()
-		log.Println("Shutting down server")
+		logger.Log.Warn("Shutting down server")
 		if err := s.Shutdown(context.Background()); err != nil {
-			log.Printf("Failed to shutdown server: %v", err)
+			logger.Log.Error("Failed to shutdown server:", zap.String("reason", err.Error()))
 		}
 	}()
 
-	log.Printf("Starting listening server at %s", options.Addr)
+	logger.Log.Info("Starting listening server at", zap.String("address", options.Addr))
 
 	if err := s.ListenAndServe(); err != http.ErrServerClosed {
-		log.Printf("Failed to listen and serve : %v", err)
+		logger.Log.Error("Failed to listen and serve", zap.String("reason", err.Error()))
 		return err
 	}
 

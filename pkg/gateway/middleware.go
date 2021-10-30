@@ -2,11 +2,12 @@ package gateway
 
 import (
 	"fmt"
-	"log"
 	"net/http"
 	"path"
 	"strings"
 
+	"github.com/scys12/simple-grpc-go/pkg/logger"
+	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/connectivity"
 )
@@ -14,12 +15,12 @@ import (
 func OpenAPIServer(dir string) http.HandlerFunc {
 	return func(rw http.ResponseWriter, r *http.Request) {
 		if !strings.HasSuffix(r.URL.Path, ".swagger.json") {
-			log.Printf("Not Found: %s", r.URL.Path)
+			logger.Log.Error("Not Found:", zap.String("url", r.URL.Path))
 			http.NotFound(rw, r)
 			return
 		}
 
-		log.Printf("Serving -> %s", r.URL.Path)
+		logger.Log.Info("Serving -> ", zap.String("url", r.URL.Path))
 		p := strings.TrimPrefix(r.URL.Path, "/openapiv2/")
 		p = path.Join(dir, p)
 		http.ServeFile(rw, r, p)

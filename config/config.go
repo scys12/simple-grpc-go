@@ -8,16 +8,18 @@ import (
 )
 
 type Config struct {
-	DBDriver   string `mapstructure:"db_driver"`
-	DBName     string `mapstructure:"db_name"`
-	DBHost     string `mapstructure:"db_host"`
-	DBPort     string `mapstructure:"db_port"`
-	DBUser     string `mapstructure:"db_user"`
-	DBPassword string `mapstructure:"db_password"`
-	HTTPPort   string `mapstructure:"http_port"`
-	GRPCPort   string `mapstructure:"grpc_port"`
-	GRPCHost   string `mapstructure:"grpc_host"`
-	OpenAPIDir string `mapstructure:"openapi_dir"`
+	DBDriver      string `mapstructure:"db_driver"`
+	DBName        string `mapstructure:"db_name"`
+	DBHost        string `mapstructure:"db_host"`
+	DBPort        string `mapstructure:"db_port"`
+	DBUser        string `mapstructure:"db_user"`
+	DBPassword    string `mapstructure:"db_password"`
+	HTTPPort      string `mapstructure:"http_port"`
+	GRPCPort      string `mapstructure:"grpc_port"`
+	GRPCHost      string `mapstructure:"grpc_host"`
+	OpenAPIDir    string `mapstructure:"openapi_dir"`
+	LogLevel      int    `mapstructure:"log_level"`
+	LogTimeFormat string `mapstructure:"log_time_format"`
 }
 
 func parseConfigFilePath() string {

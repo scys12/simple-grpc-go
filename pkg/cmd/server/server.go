@@ -8,6 +8,7 @@ import (
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/scys12/simple-grpc-go/config"
 	"github.com/scys12/simple-grpc-go/pkg/gateway"
+	"github.com/scys12/simple-grpc-go/pkg/logger"
 	"github.com/scys12/simple-grpc-go/pkg/protocol/grpc"
 	"github.com/scys12/simple-grpc-go/pkg/protocol/rest"
 	"github.com/scys12/simple-grpc-go/pkg/service/v1/todo"
@@ -19,6 +20,10 @@ func RunServer() error {
 
 	if len(cfg.GRPCPort) == 0 {
 		return fmt.Errorf("invalid TCP port for gRPC server: '%s'", cfg.GRPCPort)
+	}
+
+	if err := logger.Init(cfg.LogLevel, cfg.LogTimeFormat); err != nil {
+		return fmt.Errorf("failed to initiaize log: %v", err)
 	}
 
 	// add MySQL driver specific parameter to parse date/time
