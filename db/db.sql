@@ -1,3 +1,7 @@
+CREATE DATABASE todo;
+
+USE todo;
+
 
 CREATE TABLE `ToDo`
 (

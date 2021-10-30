@@ -4,13 +4,17 @@ import (
 	"context"
 	"time"
 
-	"github.com/golang/protobuf/ptypes"
 	v1 "github.com/scys12/simple-grpc-go/api/proto/v1"
+	"github.com/scys12/simple-grpc-go/pkg/tracer"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/timestamppb"
 )
 
 func (s *todoServiceServer) ReadAll(ctx context.Context, req *v1.ReadAllRequest) (*v1.ReadAllResponse, error) {
+	span, ctx := tracer.StartSpanFromContext(ctx, "todoservice.readalltodos")
+	defer span.Finish()
+
 	c, err := s.connect(ctx)
 	if err != nil {
 		return nil, err
@@ -30,10 +34,12 @@ func (s *todoServiceServer) ReadAll(ctx context.Context, req *v1.ReadAllRequest)
 		if err := rows.Scan(&td.Id, &td.Title, &td.Description, &reminder); err != nil {
 			return nil, status.Error(codes.Unknown, "failed to retrieve field values from ToDo row-> "+err.Error())
 		}
-		td.Reminder, err = ptypes.TimestampProto(reminder)
-		if err != nil {
+		tmp := timestamppb.New(reminder)
+		if err := tmp.CheckValid(); err != nil {
 			return nil, status.Error(codes.Unknown, "reminder field has invalid format-> "+err.Error())
 		}
+
+		td.Reminder = tmp
 		list = append(list, td)
 	}
 

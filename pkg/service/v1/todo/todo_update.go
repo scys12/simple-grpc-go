@@ -4,8 +4,8 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/golang/protobuf/ptypes"
 	v1 "github.com/scys12/simple-grpc-go/api/proto/v1"
+	"github.com/scys12/simple-grpc-go/pkg/tracer"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 )
@@ -13,17 +13,21 @@ import (
 const QUERY_UPDATE = "UPDATE ToDo SET `Title`=?, `Description`=?, `Reminder`=? WHERE `ID`=?"
 
 func (s *todoServiceServer) Update(ctx context.Context, req *v1.UpdateRequest) (*v1.UpdateResponse, error) {
+	span, ctx := tracer.StartSpanFromContext(ctx, "todoservice.updatetodo")
+	defer span.Finish()
+	span.SetTag("id", req.Todo.Id)
+
 	c, err := s.connect(ctx)
 	if err != nil {
 		return nil, err
 	}
 	defer c.Close()
 
-	reminder, err := ptypes.Timestamp(req.Todo.Reminder)
-	if err != nil {
-		return nil, status.Error(codes.InvalidArgument, "reminder field has invalid format-> "+err.Error())
+	if err := req.Todo.Reminder.CheckValid(); err != nil {
+		return nil, status.Error(codes.InvalidArgument, "reminder has invalid format-> "+err.Error())
 	}
 
+	reminder := req.Todo.Reminder.AsTime()
 	res, err := c.ExecContext(
 		ctx,
 		QUERY_UPDATE,

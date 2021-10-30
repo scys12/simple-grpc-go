@@ -9,9 +9,11 @@ import (
 	"github.com/scys12/simple-grpc-go/config"
 	"github.com/scys12/simple-grpc-go/pkg/gateway"
 	"github.com/scys12/simple-grpc-go/pkg/logger"
+	"github.com/scys12/simple-grpc-go/pkg/monitoring"
 	"github.com/scys12/simple-grpc-go/pkg/protocol/grpc"
 	"github.com/scys12/simple-grpc-go/pkg/protocol/rest"
 	"github.com/scys12/simple-grpc-go/pkg/service/v1/todo"
+	"github.com/scys12/simple-grpc-go/pkg/tracer"
 )
 
 func RunServer() error {
@@ -23,13 +25,20 @@ func RunServer() error {
 	}
 
 	if err := logger.Init(cfg.LogLevel, cfg.LogTimeFormat); err != nil {
-		return fmt.Errorf("failed to initiaize log: %v", err)
+		return fmt.Errorf("failed to initiaize log: %v", err.Error())
 	}
 
-	// add MySQL driver specific parameter to parse date/time
-	// Drop it for another database
-	param := "parseTime=true"
+	if err := monitoring.Init(); err != nil {
+		return fmt.Errorf("unable to initialize monitoring: %v", err.Error())
+	}
 
+	closer, err := tracer.Init("simple-grpc-go")
+	if err != nil {
+		return fmt.Errorf("unable to initialize jaeger: %v", err.Error())
+	}
+	defer closer.Close()
+
+	param := "parseTime=true"
 	dsn := fmt.Sprintf(
 		"%s:%s@tcp(%s:%s)/%s?%s",
 		cfg.DBUser,

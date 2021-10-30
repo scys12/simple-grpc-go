@@ -4,8 +4,10 @@ import (
 	"context"
 	"net/http"
 
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"github.com/scys12/simple-grpc-go/pkg/gateway"
 	"github.com/scys12/simple-grpc-go/pkg/logger"
+	"github.com/scys12/simple-grpc-go/pkg/monitoring"
 	"go.uber.org/zap"
 )
 
@@ -29,6 +31,7 @@ func RunServer(ctx context.Context, options gateway.Options) error {
 	mux := http.NewServeMux()
 	mux.HandleFunc("/openapiv2/", gateway.OpenAPIServer(options.OpenAPIDir))
 	mux.HandleFunc("/health", gateway.CheckHealth(conn))
+	mux.Handle("/prometheus", promhttp.Handler())
 
 	gtw, err := gateway.NewGateway(ctx, conn, options.Mux)
 	if err != nil {
@@ -36,10 +39,11 @@ func RunServer(ctx context.Context, options gateway.Options) error {
 	}
 
 	mux.Handle("/", gtw)
+	wrappedMux := monitoring.Middleware(mux)
 
 	s := &http.Server{
 		Addr:    options.Addr,
-		Handler: mux,
+		Handler: wrappedMux,
 	}
 
 	go func() {
