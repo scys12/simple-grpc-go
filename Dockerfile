@@ -1,4 +1,4 @@
-FROM golang:1.16 AS build
+FROM golang:1.16.9 AS build
 
 # Environment variables will be put here
 ENV GO111MODULE=on
@@ -17,7 +17,7 @@ COPY . .
 
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -ldflags="-w -s" -o main .
 
-FROM alpine
+FROM alpine:latest
 COPY --from=build /go/src/simple-grpc-go/config.env go/bin/simple-grpc-go/
 COPY --from=build /go/src/simple-grpc-go/main go/bin/simple-grpc-go/
 

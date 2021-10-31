@@ -45,7 +45,7 @@ func (s *todoServiceServer) Read(ctx context.Context, req *v1.ReadRequest) (*v1.
 
 	var todo v1.Todo
 	var reminder time.Time
-	if err := rows.Scan(todo.Id, todo.Title, todo.Description, reminder); err != nil {
+	if err := rows.Scan(&todo.Id, &todo.Title, &todo.Description, &reminder); err != nil {
 		return nil, status.Error(codes.Unknown, "failed to retrieve field values from ToDo row-> "+err.Error())
 	}
 	tmp := timestamppb.New(reminder)

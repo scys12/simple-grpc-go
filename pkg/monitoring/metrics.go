@@ -7,7 +7,7 @@ var totalRequests = prometheus.NewCounterVec(
 		Name: "http_requests_total",
 		Help: "Number of incoming requests",
 	},
-	[]string{"path", "method"},
+	[]string{"path"},
 )
 
 var responseStatus = prometheus.NewCounterVec(
@@ -15,7 +15,7 @@ var responseStatus = prometheus.NewCounterVec(
 		Name: "response_status",
 		Help: "HTTP response status codes",
 	},
-	[]string{"status", "path", "method"},
+	[]string{"status"},
 )
 
 var latency = prometheus.NewHistogramVec(
@@ -23,5 +23,5 @@ var latency = prometheus.NewHistogramVec(
 		Name: "http_response_time_seconds",
 		Help: "Latency of HTTP Requests",
 	},
-	[]string{"path", "method"},
+	[]string{"path"},
 )
