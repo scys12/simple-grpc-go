@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	v1 "github.com/scys12/simple-grpc-go/api/proto/v1"
+	"github.com/scys12/simple-grpc-go/pkg/logger"
 	"github.com/scys12/simple-grpc-go/pkg/tracer"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -13,6 +14,8 @@ import (
 const QUERY_DELETE = "DELETE FROM ToDo WHERE `ID`=?"
 
 func (s *todoServiceServer) Delete(ctx context.Context, req *v1.DeleteRequest) (*v1.DeleteResponse, error) {
+	logger.Log.Info(fmt.Sprintf("Delete Todo. Todo ID: %v", req.GetId()))
+
 	span, ctx := tracer.StartSpanFromContext(ctx, "todoservice.deletetodo")
 	defer span.Finish()
 	span.SetTag("id", req.Id)

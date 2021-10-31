@@ -6,6 +6,7 @@ import (
 	"time"
 
 	v1 "github.com/scys12/simple-grpc-go/api/proto/v1"
+	"github.com/scys12/simple-grpc-go/pkg/logger"
 	"github.com/scys12/simple-grpc-go/pkg/tracer"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -15,6 +16,8 @@ import (
 const QUERY_READ = "SELECT `ID`, `Title`, `Description`, `Reminder` FROM ToDo WHERE `ID`=?"
 
 func (s *todoServiceServer) Read(ctx context.Context, req *v1.ReadRequest) (*v1.ReadResponse, error) {
+	logger.Log.Info(fmt.Sprintf("Read Todo. Todo ID: %v", req.GetId()))
+
 	span, ctx := tracer.StartSpanFromContext(ctx, "todoservice.readtodo")
 	defer span.Finish()
 	span.SetTag("id", req.Id)

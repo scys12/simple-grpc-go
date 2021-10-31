@@ -5,6 +5,7 @@ import (
 	"time"
 
 	v1 "github.com/scys12/simple-grpc-go/api/proto/v1"
+	"github.com/scys12/simple-grpc-go/pkg/logger"
 	"github.com/scys12/simple-grpc-go/pkg/tracer"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -12,6 +13,8 @@ import (
 )
 
 func (s *todoServiceServer) ReadAll(ctx context.Context, req *v1.ReadAllRequest) (*v1.ReadAllResponse, error) {
+	logger.Log.Info("Read Many Todos.")
+
 	span, ctx := tracer.StartSpanFromContext(ctx, "todoservice.readalltodos")
 	defer span.Finish()
 

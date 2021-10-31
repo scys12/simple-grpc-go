@@ -2,8 +2,10 @@ package todo
 
 import (
 	"context"
+	"fmt"
 
 	v1 "github.com/scys12/simple-grpc-go/api/proto/v1"
+	"github.com/scys12/simple-grpc-go/pkg/logger"
 	"github.com/scys12/simple-grpc-go/pkg/tracer"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -12,6 +14,8 @@ import (
 const QUERY_INSERT = "INSERT INTO ToDo(`Title`, `Description`, `Reminder`) VALUES(?, ?, ?)"
 
 func (s *todoServiceServer) Create(ctx context.Context, req *v1.CreateRequest) (*v1.CreateResponse, error) {
+	logger.Log.Info(fmt.Sprintf("Create Todo. Todo Name : %v", req.GetTodo().Title))
+
 	span, ctx := tracer.StartSpanFromContext(ctx, "todoservice.createtodo")
 	defer span.Finish()
 	span.SetTag("todo-name", req.GetTodo().GetTitle())

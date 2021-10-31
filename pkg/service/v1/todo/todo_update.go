@@ -5,6 +5,7 @@ import (
 	"fmt"
 
 	v1 "github.com/scys12/simple-grpc-go/api/proto/v1"
+	"github.com/scys12/simple-grpc-go/pkg/logger"
 	"github.com/scys12/simple-grpc-go/pkg/tracer"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -13,6 +14,8 @@ import (
 const QUERY_UPDATE = "UPDATE ToDo SET `Title`=?, `Description`=?, `Reminder`=? WHERE `ID`=?"
 
 func (s *todoServiceServer) Update(ctx context.Context, req *v1.UpdateRequest) (*v1.UpdateResponse, error) {
+	logger.Log.Info(fmt.Sprintf("Update Todo. Todo ID: %v", req.GetTodo().Id))
+
 	span, ctx := tracer.StartSpanFromContext(ctx, "todoservice.updatetodo")
 	defer span.Finish()
 	span.SetTag("id", req.Todo.Id)
